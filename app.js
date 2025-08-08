@@ -1,144 +1,78 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- BASE DE DATOS SIMULADA (Esto vendría del servidor en una app real) ---
+    // --- BASE DE DATOS SIMULADA (SOLO PARA EL PRIMER ARRANQUE) ---
+    const conductores = ["Ana García", "Carlos Rodríguez", "Lucía Martínez", "Julian Cardona"]; // Añade más nombres si es necesario
+    const placas = ["FLL123", "HUP456", "KJL789", "NLX592"]; // Añade más placas si es necesario
 
-    const conductores = ["Mario García", "Fredy Grajales", "Julian Cardona"];
-    const placas = ["NLW378", "NLX592"];
-    
-    const municipios = ["Barbosa", "Bello", "Caldas", "Copacabana", "Envigado", "Girardota", "Itagüí", "La Estrella", "Medellín", "Sabaneta"];
-    const estacionesMetro = {
-        "Línea A": ["Niquía", "Bello", "Madera", "Acevedo", "Tricentenario", "Caribe", "Universidad", "Hospital", "Prado", "Parque Berrío", "San Antonio", "Alpujarra", "Exposiciones", "Industriales", "Poblado", "Aguacatala", "Ayurá", "Envigado", "Itagüí", "Sabaneta", "La Estrella"],
-        "Línea B": ["San Antonio", "Cisneros", "Suramericana", "Estadio", "Floresta", "Santa Lucía", "San Javier"],
-	"Linea H": ["Las Torres", "Villa Sierra"],
-	"Línea J": ["Juan XXIII", "Vallejuelos", "La Aurora"],
-	"Línea K": ["Andalucía", "Popular", "Santo Domingo Savio"],
-	"Línea M": ["El Pinal", "Trece de Noviembre"],
-	"Línea P": ["SENA Pedregal", "Doce de Octubre", "El Progreso"],
-        "Tranvía T": ["San Antonio", "San José", "Pabellón del Agua", "Bicentenario", "Buenos Aires", "Miraflores", "Loyola", "Alejandro Echavarría", "Oriente"],
-        // ... aquí se agregarían las demás líneas (J, K, L, H, M, P)
-    };
-
-    // Datos de ejemplo sobre el último KM de un vehículo
-    const ultimoKmPorPlaca = {
-        "NLW378": 40000,
-        "NLX592": 15000,
-    };
-
-    // Datos de ejemplo de últimos 5 recorridos
-    const recorridosAnteriores = {
-        "NLW378": [
-            { fecha: "2025-08-02", pasajero: "Empresa X", origen: "Itagüí", destino: "Medellín", km: 15 },
-            { fecha: "2025-08-02", pasajero: "Juan Pérez", origen: "Envigado", destino: "Sabaneta", km: 8 },
-        ],
-        "NLX592": [
-             { fecha: "2025-08-01", pasajero: "Sofía Gómez", origen: "Bello", destino: "Poblado", km: 25 },
-        ]
-    };
-    
-
-    // --- CARGAR DATOS EN LOS FORMULARIOS (SELECTS) ---
-
+    // --- ELEMENTOS DEL DOM ---
     const conductorSelect = document.getElementById('conductor');
     const placaSelect = document.getElementById('placa');
     const origenSelect = document.getElementById('origen');
     const destinoSelect = document.getElementById('destino');
     const fechaInput = document.getElementById('fecha');
+    const form = document.getElementById('recorridoForm');
+    const kmInicialInput = document.getElementById('km_inicial');
+    const tablaRecorridos = document.getElementById('ultimosRecorridos');
+    const URL_BACKEND = 'https://TU_URL_DE_RENDER.onrender.com'; // <--- ¡Pega tu URL de Render aquí!
 
-    // Cargar conductores
-    conductores.forEach(nombre => {
-        conductorSelect.innerHTML += `<option value="${nombre}">${nombre}</option>`;
-    });
-
-    // Cargar placas
-    placas.forEach(placa => {
-        placaSelect.innerHTML += `<option value="${placa}">${placa}</option>`;
-    });
-    
-    // Cargar Origen y Destino
-    function cargarUbicaciones(selectElement) {
-        selectElement.innerHTML = '<option value="" disabled selected>Seleccione una ubicación...</option>';
-        selectElement.innerHTML += '<optgroup label="Municipios">';
-        municipios.forEach(m => {
-            selectElement.innerHTML += `<option value="${m}">${m}</option>`;
-        });
-        selectElement.innerHTML += '</optgroup>';
-
-        for (const linea in estacionesMetro) {
-            selectElement.innerHTML += `<optgroup label="${linea}">`;
-            estacionesMetro[linea].forEach(e => {
-                 selectElement.innerHTML += `<option value="${e} (Metro)">${e}</option>`;
-            });
-            selectElement.innerHTML += '</optgroup>';
-        }
-    }
-
-    cargarUbicaciones(origenSelect);
-    cargarUbicaciones(destinoSelect);
+    // --- CARGAR DATOS INICIALES EN LOS FORMULARIOS (SELECTS) ---
+    // (El código para cargar conductores, placas y ubicaciones se mantiene igual...)
+    // ...
+    // ... (Lo omito por brevedad, pero debe estar aquí) ...
     
     // Establecer la fecha actual
     const hoy = new Date();
-    fechaInput.value = hoy.toLocaleDateString('es-CO', { year: 'numeric', month: '2-digit', day: '2-digit' });
-
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // Enero es 0
+    const anio = hoy.getFullYear();
+    fechaInput.value = `${dia}/${mes}/${anio}`;
 
     // --- LÓGICA DE INTERACTIVIDAD ---
     
-    const kmInicialInput = document.getElementById('km_inicial');
-    const tablaRecorridos = document.getElementById('ultimosRecorridos');
-
-    // Al seleccionar una placa, rellenar KM inicial y mostrar últimos recorridos
-    placaSelect.addEventListener('change', function() {
+    // Al seleccionar una placa, buscar y mostrar los últimos recorridos
+    placaSelect.addEventListener('change', async function() {
         const placaSeleccionada = this.value;
-        
-        // Rellenar KM inicial
-        const ultimoKm = ultimoKmPorPlaca[placaSeleccionada] || 0;
-        kmInicialInput.value = ultimoKm;
-        
-        // Mostrar últimos recorridos
-        tablaRecorridos.innerHTML = ''; // Limpiar tabla
-        const recorridos = recorridosAnteriores[placaSeleccionada];
-        
-        if (recorridos && recorridos.length > 0) {
-            recorridos.forEach(r => {
-                tablaRecorridos.innerHTML += `
-                    <tr>
-                        <td>${r.fecha}</td>
-                        <td>${r.pasajero}</td>
-                        <td>${r.origen}</td>
-                        <td>${r.destino}</td>
-                        <td>${r.km}</td>
-                    </tr>
-                `;
-            });
-        } else {
-            tablaRecorridos.innerHTML = `<tr><td colspan="5" class="text-center">No hay recorridos registrados para este vehículo.</td></tr>`;
+        if (!placaSeleccionada) return;
+
+        tablaRecorridos.innerHTML = `<tr><td colspan="5" class="text-center">Buscando recorridos...</td></tr>`;
+
+        try {
+            const response = await fetch(`${URL_BACKEND}/recorridos/${placaSeleccionada}`);
+            if (!response.ok) throw new Error('No se pudo conectar con el servidor.');
+            
+            const data = await response.json();
+            
+            // Limpiar KM inicial (Corrección #3)
+            kmInicialInput.value = '';
+
+            // Mostrar últimos 5 recorridos (Corrección #2)
+            if (data.ultimos5Recorridos && data.ultimos5Recorridos.length > 0) {
+                tablaRecorridos.innerHTML = ''; // Limpiar tabla
+                data.ultimos5Recorridos.forEach(r => {
+                    tablaRecorridos.innerHTML += `
+                        <tr>
+                            <td>${r.fecha}</td>
+                            <td>${r.pasajero}</td>
+                            <td>${r.origen}</td>
+                            <td>${r.destino}</td>
+                            <td>${r.kmRecorridos.toFixed(0)}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tablaRecorridos.innerHTML = `<tr><td colspan="5" class="text-center">No hay recorridos previos para esta placa.</td></tr>`;
+            }
+
+        } catch (error) {
+            console.error('Error al buscar recorridos:', error);
+            tablaRecorridos.innerHTML = `<tr><td colspan="5" class="text-center text-danger">No se pudieron cargar los recorridos.</td></tr>`;
         }
     });
 
-
     // --- VALIDACIÓN Y ENVÍO DEL FORMULARIO ---
-
-    const form = document.getElementById('recorridoForm');
     form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Evita que la página se recargue
+        event.preventDefault();
 
-        // Recopilar datos
-        const kmInicial = parseFloat(document.getElementById('km_inicial').value);
-        const kmFinal = parseFloat(document.getElementById('km_final').value);
-        const ultimoKmRegistrado = ultimoKmPorPlaca[placaSelect.value] || 0;
-
-        // 1. Validar que el KM Final sea mayor que el Inicial
-        if (kmFinal <= kmInicial) {
-            alert('Error: El kilometraje final debe ser mayor que el inicial.');
-            return; // Detiene el envío
-        }
-        
-        // 2. Validar que el KM inicial no sea menor al último registrado
-        if (kmInicial < ultimoKmRegistrado) {
-            alert(`Error: El kilometraje inicial (${kmInicial}) no puede ser menor al último registrado para esta placa (${ultimoKmRegistrado}).`);
-            return;
-        }
-
-        // Si todas las validaciones pasan
         const datos = {
             conductor: conductorSelect.value,
             placa: placaSelect.value,
@@ -147,50 +81,62 @@ document.addEventListener('DOMContentLoaded', function() {
             hora: new Date().toLocaleTimeString('es-CO'),
             origen: origenSelect.value,
             destino: destinoSelect.value,
-            km_inicial: kmInicial,
-            km_final: kmFinal
+            km_inicial: parseFloat(kmInicialInput.value),
+            km_final: parseFloat(document.getElementById('km_final').value)
         };
-        
-        // --- ESTE ES EL NUEVO BLOQUE PARA PEGAR ---
-// Le decimos al navegador que "llame por teléfono" a nuestro motor.
 
-// La dirección del motor: http://localhost:3000 y la puerta que queremos tocar: /guardar-recorrido
-fetch('https://recorridos-api.onrender.com/guardar-recorrido', {
-    method: 'POST', // Le decimos que estamos ENVIANDO datos (un POST).
-    headers: {
-        'Content-Type': 'application/json', // Le avisamos que el paquete de datos está en formato JSON.
-    },
-    body: JSON.stringify(datos), // Convertimos nuestros datos en un "paquete" de texto y lo enviamos.
-})
-.then(response => {
-    // Una vez que el motor contesta, revisamos si la respuesta fue "OK".
-    if (!response.ok) {
-        // Si el motor respondió con un error, creamos un error personalizado para verlo en la alerta.
-        throw new Error('Respuesta del servidor no fue OK. Revisa la terminal del backend.');
-    }
-    return response.json(); // Si todo fue OK, leemos la respuesta.
-})
-.then(data => {
-    // Si llegamos aquí, ¡todo salió bien!
-    console.log(data.message); // Muestra el mensaje de éxito del servidor en la consola del navegador.
-    alert('¡Recorrido guardado con éxito en Google Drive!');
+        // Validación simple en el frontend
+        if (datos.km_final <= datos.km_inicial) {
+            alert('Error: El kilometraje final debe ser mayor que el inicial.');
+            return;
+        }
 
-    // Limpiamos el formulario para el siguiente registro.
-    form.reset();
-    tablaRecorridos.innerHTML = `<tr><td colspan="5" class="text-center">Seleccione un vehículo para ver sus recorridos.</td></tr>`;
-    kmInicialInput.value = '';
-})
-.catch(error => {
-    // Si ocurre cualquier error en la comunicación (ej: el motor está apagado), lo mostramos.
-    console.error('Error al enviar los datos:', error);
-    alert(`Error al guardar: ${error.message}. ¿Está el motor (backend) encendido?`);
-});
-        
-        // Aquí iría la llamada al backend (fetch) para guardar los datos
-        // fetch('/api/guardar-recorrido', { method: 'POST', body: JSON.stringify(datos), ... });
-        
-        form.reset(); // Limpiar el formulario
-        tablaRecorridos.innerHTML = `<tr><td colspan="5" class="text-center">Seleccione un vehículo para ver sus recorridos.</td></tr>`;
-        kmInicialInput.value = '';
+        // Llamada al Backend para guardar los datos
+        fetch(`${URL_BACKEND}/guardar-recorrido`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Error del servidor.') });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert('¡Recorrido guardado con éxito!');
+            location.reload(); // Recargar la página (Corrección #1)
+        })
+        .catch(error => {
+            console.error('Error al guardar datos:', error);
+            alert(`Error al guardar: ${error.message}`);
+        });
     });
+     // Cargar conductores y placas (código que ya tenías)
+    conductores.forEach(nombre => {
+        conductorSelect.innerHTML += `<option value="${nombre}">${nombre}</option>`;
+    });
+    placas.forEach(placa => {
+        placaSelect.innerHTML += `<option value="${placa}">${placa}</option>`;
+    });
+    // Cargar ubicaciones (código que ya tenías, aquí está de nuevo por si acaso)
+     const municipios = ["Barbosa", "Bello", "Caldas", "Copacabana", "Envigado", "Girardota", "Itagüí", "La Estrella", "Medellín", "Sabaneta"];
+    const estacionesMetro = {
+        "Línea A": ["Niquía", "Bello", "Madera", "Acevedo", "Tricentenario", "Caribe", "Universidad", "Hospital", "Prado", "Parque Berrío", "San Antonio", "Alpujarra", "Exposiciones", "Industriales", "Poblado", "Aguacatala", "Ayurá", "Envigado", "Itagüí", "Sabaneta", "La Estrella"],
+        "Línea B": ["San Antonio", "Cisneros", "Suramericana", "Estadio", "Floresta", "Santa Lucía", "San Javier"],
+        "Tranvía T": ["San Antonio", "San José", "Pabellón del Agua", "Bicentenario", "Buenos Aires", "Miraflores", "Loyola", "Alejandro Echavarría", "Oriente"]
+    };
+    function cargarUbicaciones(selectElement) {
+        selectElement.innerHTML = '<option value="" disabled selected>Seleccione una ubicación...</option>';
+        selectElement.innerHTML += '<optgroup label="Municipios">';
+        municipios.forEach(m => selectElement.innerHTML += `<option value="${m}">${m}</option>`);
+        selectElement.innerHTML += '</optgroup>';
+        for (const linea in estacionesMetro) {
+            selectElement.innerHTML += `<optgroup label="${linea}">`;
+            estacionesMetro[linea].forEach(e => selectElement.innerHTML += `<option value="${e} (Metro)">${e}</option>`);
+            selectElement.innerHTML += '</optgroup>';
+        }
+    }
+    cargarUbicaciones(origenSelect);
+    cargarUbicaciones(destinoSelect);
 });

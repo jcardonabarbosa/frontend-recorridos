@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('recorridoForm');
     const kmInicialInput = document.getElementById('km_inicial');
     const tablaRecorridos = document.getElementById('ultimosRecorridos');
-    const URL_BACKEND = 'https://TU_URL_DE_RENDER.onrender.com'; // <--- ¡Pega tu URL de Render aquí!
+    const URL_BACKEND = 'https://recorridos-api.onrender.com'; // <--- ¡Pega tu URL de Render aquí!
 
     // --- CARGAR DATOS INICIALES EN LOS FORMULARIOS (SELECTS) ---
     // (El código para cargar conductores, placas y ubicaciones se mantiene igual...)

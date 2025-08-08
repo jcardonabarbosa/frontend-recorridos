@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- BASE DE DATOS SIMULADA (SOLO PARA EL PRIMER ARRANQUE) ---
-    const conductores = ["Ana García", "Carlos Rodríguez", "Lucía Martínez", "Julian Cardona"]; // Añade más nombres si es necesario
-    const placas = ["FLL123", "HUP456", "KJL789", "NLX592"]; // Añade más placas si es necesario
+    const conductores = ["Mario García", "Fredy Grajales", "Julian Cardona"]; // Añade más nombres si es necesario
+    const placas = ["NLW378", "NLX592"]; // Añade más placas si es necesario
 
     // --- ELEMENTOS DEL DOM ---
     const conductorSelect = document.getElementById('conductor');

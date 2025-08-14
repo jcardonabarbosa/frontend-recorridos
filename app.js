@@ -124,7 +124,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const estacionesMetro = {
         "Línea A": ["Niquía", "Bello", "Madera", "Acevedo", "Tricentenario", "Caribe", "Universidad", "Hospital", "Prado", "Parque Berrío", "San Antonio", "Alpujarra", "Exposiciones", "Industriales", "Poblado", "Aguacatala", "Ayurá", "Envigado", "Itagüí", "Sabaneta", "La Estrella"],
         "Línea B": ["San Antonio", "Cisneros", "Suramericana", "Estadio", "Floresta", "Santa Lucía", "San Javier"],
-        "Tranvía T": ["San Antonio", "San José", "Pabellón del Agua", "Bicentenario", "Buenos Aires", "Miraflores", "Loyola", "Alejandro Echavarría", "Oriente"]
+	"Linea H": ["Las Torres", "Villa Sierra"],
+	"Línea J": ["Juan XXIII", "Vallejuelos", "La Aurora"],
+	"Línea K": ["Andalucía", "Popular", "Santo Domingo Savio"],
+	"Línea M": ["El Pinal", "Trece de Noviembre"],
+	"Línea P": ["SENA Pedregal", "Doce de Octubre", "El Progreso"],
+        "Tranvía T": ["San Antonio", "San José", "Pabellón del Agua", "Bicentenario", "Buenos Aires", "Miraflores", "Loyola", "Alejandro Echavarría", "Oriente"],
     };
     function cargarUbicaciones(selectElement) {
         selectElement.innerHTML = '<option value="" disabled selected>Seleccione una ubicación...</option>';

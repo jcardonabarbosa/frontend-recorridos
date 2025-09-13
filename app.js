@@ -131,6 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	"Línea M": ["El Pinal", "Trece de Noviembre"],
 	"Línea P": ["SENA Pedregal", "Doce de Octubre", "El Progreso"],
         "Tranvía T": ["San Antonio", "San José", "Pabellón del Agua", "Bicentenario", "Buenos Aires", "Miraflores", "Loyola", "Alejandro Echavarría", "Oriente"],
+	"Metroplus Linea 1": ["Universidad de Medellín", "Los Alpes", "La Palma", "Parque de Belén", "Rosales", "Fátima", "Nutibara", "Industriales Plus", "Plaza Mayor", "Cisneros", "Minorista", "Chagualo", "Ruta N", "Hospital Plus", "Palos Verdes", "Gardel", "Manrique", "Las Esmeraldas", "Berlín", "Parque de Aranjuez"],
+
+
     };
     function cargarUbicaciones(selectElement) {
         selectElement.innerHTML = '<option value="" disabled selected>Seleccione una ubicación...</option>';

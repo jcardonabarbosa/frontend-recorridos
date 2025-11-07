@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // --- BASE DE DATOS SIMULADA (SOLO PARA EL PRIMER ARRANQUE) ---
-    const conductores = ["Mario García", "Fredy Grajales", "Julian Cardona", "Juan Henao"]; // Añade más nombres si es necesario
+    const conductores = ["Robinson Castañeda", "Fredy Grajales", "Julian Cardona", "Juan Henao", "Ana Sánchez"]; // Añade más nombres si es necesario
     const placas = ["NLW378", "NLX592", "NWW977"]; // Añade más placas si es necesario
 
     // --- ELEMENTOS DEL DOM ---
